@@ -9,15 +9,118 @@ from supabase import create_client, Client
 
 load_dotenv()
 
-st.set_page_config(page_title="AI Text-to-Audio App", page_icon="🎧")
+st.set_page_config(page_title="AudioSynth AI", page_icon="🎧", layout="centered")
+
+# --- Custom CSS Injection ---
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
+    color: #1E293B;
+}
+
+/* Background */
+.stApp {
+    background-color: #F8FAFC;
+}
+
+/* Hero Section */
+.hero-container {
+    text-align: center;
+    padding: 3rem 1rem 2rem 1rem;
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, rgba(99,102,241,0.05) 0%, rgba(139,92,246,0.05) 100%);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+}
+.hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    background: linear-gradient(to right, #6366F1, #8B5CF6, #06B6D4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+}
+.hero-subtitle {
+    font-size: 1.1rem;
+    color: #64748B;
+    font-weight: 400;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Cards & Upload Area */
+div[data-testid="stFileUploader"] {
+    background-color: #FFFFFF;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    border: 1px dashed #CBD5E1;
+    transition: all 0.3s ease;
+}
+div[data-testid="stFileUploader"]:hover {
+    border-color: #6366F1;
+    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.1);
+}
+
+/* Buttons */
+.stButton>button {
+    background: linear-gradient(to right, #6366F1, #8B5CF6) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 9999px !important;
+    padding: 0.75rem 2rem !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.39) !important;
+}
+.stButton>button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.23) !important;
+}
+.stDownloadButton>button {
+    background: linear-gradient(to right, #22C55E, #16A34A) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 9999px !important;
+    padding: 0.75rem 2rem !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 14px 0 rgba(34, 197, 94, 0.39) !important;
+}
+.stDownloadButton>button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.23) !important;
+}
+
+/* Success/Info Alerts */
+.stAlert {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* Hide default hamburger menu and footer for clean SaaS look */
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+</style>
+""", unsafe_allow_html=True)
 
 # Supabase Initialization
 url = os.environ.get("SUPABASE_URL")
 key = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
-st.title("🎧 Text-to-Audio Converter")
-st.write("Upload a document, and we will convert it to speech using AI! (Integrated with Supabase)")
+# --- Hero Section ---
+st.markdown("""
+<div class="hero-container">
+    <h1 class="hero-title">AudioSynth AI</h1>
+    <p class="hero-subtitle">Transform your documents into lifelike speech instantly. Upload a PDF, Word, or text file to get started.</p>
+</div>
+""", unsafe_allow_html=True)
 
 # 1. File Upload
 uploaded_file = st.file_uploader("Choose a file (PDF, TXT, DOCX)", type=["pdf", "txt", "docx"])

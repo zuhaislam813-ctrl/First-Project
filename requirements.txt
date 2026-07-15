@@ -1,5 +1,5 @@
-streamlit==1.33.0
-PyMuPDF==1.24.1
-python-docx==1.1.0
-supabase==2.4.3
-python-dotenv==1.0.1
+streamlit
+pymupdf
+python-docx
+supabase
+python-dotenv
