@@ -6,6 +6,7 @@ import os
 import time
 from dotenv import load_dotenv
 from supabase import create_client, Client
+from google.cloud import texttospeech
 
 load_dotenv()
 
@@ -188,7 +189,7 @@ if uploaded_file is not None:
         st.text(extracted_text[:1000] + ("..." if len(extracted_text) > 1000 else ""))
         
     if st.button("Convert to Audio 🎙️"):
-        st.info("Generating audio... (In this simplified demo, we return a mock file if no API key is provided!)")
+        st.info("Generating audio with Google Cloud Text-to-Speech...")
         
         with st.spinner("Talking to AI and updating Supabase..."):
             # 3. Create audio conversion record
@@ -199,17 +200,40 @@ if uploaded_file is not None:
             conv_res = supabase.table("audio_conversions").insert(conv_data).execute()
             conversion_id = conv_res.data[0]['id']
             
-            # Simulate processing time
-            time.sleep(2) 
-            
-            # Create a mock audio file
-            mock_audio_content = b"Mock Audio Content" 
+            # Generate audio using Google Cloud Text-to-Speech
+            try:
+                client = texttospeech.TextToSpeechClient(client_options={"api_key": os.environ.get("GOOGLE_API_KEY")})
+                
+                # Google TTS limit is 5000 bytes per request, so 4096 is safe
+                text_to_speak = extracted_text[:4096] if extracted_text else "No text found."
+                
+                synthesis_input = texttospeech.SynthesisInput(text=text_to_speak)
+                voice = texttospeech.VoiceSelectionParams(
+                    language_code="en-US",
+                    name="en-US-Journey-F"
+                )
+                audio_config = texttospeech.AudioConfig(
+                    audio_encoding=texttospeech.AudioEncoding.MP3
+                )
+                
+                response = client.synthesize_speech(
+                    input=synthesis_input, voice=voice, audio_config=audio_config
+                )
+                audio_content = response.audio_content
+            except Exception as e:
+                st.error(f"Failed to generate audio with Google Cloud TTS: {e}")
+                supabase.table("audio_conversions").update({
+                    "status": "failed",
+                    "completed_at": "now()"
+                }).eq("id", conversion_id).execute()
+                st.stop()
+                
             audio_storage_path = f"{int(time.time())}_generated_audio.mp3"
             
             # Upload generated audio to Supabase
             supabase.storage.from_("generated_audio").upload(
                 path=audio_storage_path,
-                file=mock_audio_content,
+                file=audio_content,
                 file_options={"content-type": "audio/mpeg"}
             )
             
@@ -224,7 +248,7 @@ if uploaded_file is not None:
             
             st.download_button(
                 label="Download Audio 📥",
-                data=mock_audio_content,
+                data=audio_content,
                 file_name="generated_audio.mp3",
                 mime="audio/mpeg"
             )
