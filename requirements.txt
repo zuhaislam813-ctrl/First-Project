@@ -1,0 +1,8 @@
+streamlit
+pymupdf
+python-docx
+supabase
+python-dotenv
+
+openai
+google-cloud-texttospeech

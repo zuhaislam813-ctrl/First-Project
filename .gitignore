@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+venv/
+env/
+*dummy*.txt
+*commit*.txt
+first_file.txt
