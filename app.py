@@ -116,8 +116,6 @@ url = os.environ.get("SUPABASE_URL")
 key = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
-# Debug check for API key
-st.sidebar.info(f"Debug - GOOGLE_API_KEY loaded: {'Yes' if os.environ.get('GOOGLE_API_KEY') else 'No'}")
 
 # --- Hero Section ---
 st.markdown("""
