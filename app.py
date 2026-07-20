@@ -7,8 +7,9 @@ import time
 from dotenv import load_dotenv
 from supabase import create_client, Client
 from google.cloud import texttospeech
+from google.api_core.client_options import ClientOptions
 
-load_dotenv()
+load_dotenv(override=True)
 
 st.set_page_config(page_title="AudioSynth AI", page_icon="🎧", layout="centered")
 
@@ -115,6 +116,9 @@ url = os.environ.get("SUPABASE_URL")
 key = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
+# Debug check for API key
+st.sidebar.info(f"Debug - GOOGLE_API_KEY loaded: {'Yes' if os.environ.get('GOOGLE_API_KEY') else 'No'}")
+
 # --- Hero Section ---
 st.markdown("""
 <div class="hero-container">
@@ -202,7 +206,8 @@ if uploaded_file is not None:
             
             # Generate audio using Google Cloud Text-to-Speech
             try:
-                client = texttospeech.TextToSpeechClient(client_options={"api_key": os.environ.get("GOOGLE_API_KEY")})
+                client_options = ClientOptions(api_key=os.environ.get("GOOGLE_API_KEY"))
+                client = texttospeech.TextToSpeechClient(client_options=client_options)
                 
                 # Google TTS limit is 5000 bytes per request, so 4096 is safe
                 text_to_speak = extracted_text[:4096] if extracted_text else "No text found."
